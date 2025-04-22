@@ -1,0 +1,31 @@
+name: Build .NET Framework 4.8
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build Project
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Restore NuGet Packages
+      run: nuget restore DesktopCountdown.csproj
+
+    - name: Build Project
+      run: msbuild DesktopCountdown.csproj /p:Configuration=Release /p:Platform="AnyCPU"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-output
+        path: bin/Release/
