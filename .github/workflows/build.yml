@@ -1,0 +1,39 @@
+name: Build DesktopCountdown
+
+on:
+  push:
+    branches: [ main, Indev ]
+  pull_request:
+    branches: [ main, Indev ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+      
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+      
+    - name: Restore NuGet packages
+      run: nuget restore DesktopCountdown.sln
+      
+    - name: Build solution
+      run: msbuild DesktopCountdown.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=bin\Release\
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: DesktopCountdown-${{ github.sha }}
+        path: |
+          bin/Release/DesktopCountdown.exe
+          bin/Release/DesktopCountdown.exe.config
+          bin/Release/*.dll
+        if-no-files-found: error
+        retention-days: 90
