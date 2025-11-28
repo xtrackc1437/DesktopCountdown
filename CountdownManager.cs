@@ -7,7 +7,7 @@ namespace DesktopCountdown
     /// <summary>
     /// 倒计时管理器，负责处理倒计时逻辑和窗口更新
     /// </summary>
-    public class CountdownManager
+    public class CountdownManager : IDisposable
     {
         private readonly System.Windows.Forms.Timer countdownTimer;
         private readonly Label countdownLabel;
@@ -92,25 +92,62 @@ namespace DesktopCountdown
         public void UpdateWindow()
         {
             TimeSpan remainingTime = targetTime - DateTime.Now;
-            string content = windowContent
-                .Replace("{EventName}", eventName)
-                .Replace("{Days}", remainingTime.Days.ToString())
-                .Replace("{Hours}", remainingTime.Hours.ToString())
-                .Replace("{Mins}", remainingTime.Minutes.ToString())
-                .Replace("{Seconds}", remainingTime.Seconds.ToString());
+            string content;
+            
+            // 处理目标时间已过的情况
+            if (remainingTime < TimeSpan.Zero)
+            {
+                content = $"{eventName} 已结束！";
+                // 停止计时器
+                countdownTimer.Stop();
+            }
+            else
+            {
+                content = windowContent
+                    .Replace("{EventName}", eventName)
+                    .Replace("{Days}", remainingTime.Days.ToString())
+                    .Replace("{Hours}", remainingTime.Hours.ToString())
+                    .Replace("{Mins}", remainingTime.Minutes.ToString())
+                    .Replace("{Seconds}", remainingTime.Seconds.ToString());
+            }
 
             countdownLabel.Text = content;
             countdownLabel.Font = new Font("Arial", fontSize);
             countdownLabel.ForeColor = textColor;
         }
 
+        #region IDisposable 实现
+        
+        private bool disposedValue = false; // 用于检测冗余调用
+
         /// <summary>
         /// 清理计时器资源
         /// </summary>
         public void Dispose()
         {
-            countdownTimer.Stop();
-            countdownTimer.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        /// <summary>
+        /// 释放资源的核心方法
+        /// </summary>
+        /// <param name="disposing">是否释放托管资源</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // 释放托管资源
+                    countdownTimer.Stop();
+                    countdownTimer.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+        
+        #endregion
     }
 }

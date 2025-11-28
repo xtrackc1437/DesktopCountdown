@@ -6,10 +6,10 @@ namespace DesktopCountdown
 {
     public partial class MainForm : Form
     {
-        // 使用独立的管理器类
-        private ConfigurationManager configManager;
-        private CountdownManager countdownManager;
-        private TrayIconManager trayIconManager;
+        // 使用独立的管理器类，改为protected以便在Dispose方法中访问
+        protected ConfigurationManager configManager;
+        protected CountdownManager countdownManager;
+        protected TrayIconManager trayIconManager;
 
         public MainForm()
         {

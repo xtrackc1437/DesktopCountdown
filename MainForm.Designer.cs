@@ -1,4 +1,4 @@
-﻿namespace DesktopCountdown
+namespace DesktopCountdown
 {
     partial class MainForm
     {
@@ -17,6 +17,15 @@
             {
                 components.Dispose();
             }
+            
+            // 释放管理器资源
+            if (disposing)
+            {
+                trayIconManager?.Dispose();
+                countdownManager?.Dispose();
+                // ConfigurationManager 不实现IDisposable，不需要释放
+            }
+            
             base.Dispose(disposing);
         }
 

@@ -1,13 +1,14 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.IO;
 
 namespace DesktopCountdown
 {
     /// <summary>
     /// 托盘图标管理类，负责创建和管理系统托盘图标及菜单
     /// </summary>
-    public class TrayIconManager
+    public class TrayIconManager : IDisposable
     {
         private readonly NotifyIcon trayIcon;
         private readonly Form mainForm;
@@ -33,9 +34,29 @@ namespace DesktopCountdown
         /// </summary>
         public void InitializeTrayIcon()
         {
-            trayIcon.Icon = new Icon("app.ico");
-            trayIcon.ContextMenuStrip = CreateContextMenu();
-            trayIcon.Visible = true;
+            try
+            {
+                string iconPath = "app.ico";
+                if (File.Exists(iconPath))
+                {
+                    trayIcon.Icon = new Icon(iconPath);
+                }
+                else
+                {
+                    // 使用默认图标作为后备
+                    trayIcon.Icon = SystemIcons.Information;
+                }
+                trayIcon.ContextMenuStrip = CreateContextMenu();
+                trayIcon.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"初始化托盘图标时出错: {ex.Message}");
+                // 使用默认图标作为最终后备
+                trayIcon.Icon = SystemIcons.Information;
+                trayIcon.ContextMenuStrip = CreateContextMenu();
+                trayIcon.Visible = true;
+            }
         }
 
         /// <summary>
@@ -140,13 +161,38 @@ namespace DesktopCountdown
             Application.Exit();
         }
 
+        #region IDisposable 实现
+        
+        private bool disposedValue = false; // 用于检测冗余调用
+
         /// <summary>
         /// 清理托盘图标资源
         /// </summary>
         public void Dispose()
         {
-            trayIcon.Visible = false;
-            trayIcon.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        /// <summary>
+        /// 释放资源的核心方法
+        /// </summary>
+        /// <param name="disposing">是否释放托管资源</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // 释放托管资源
+                    trayIcon.Visible = false;
+                    trayIcon.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+        
+        #endregion
     }
 }
