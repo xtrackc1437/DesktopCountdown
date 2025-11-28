@@ -64,7 +64,7 @@ namespace DesktopCountdown
         /// </summary>
         /// <returns>上下文菜单</returns>
         private ContextMenuStrip CreateContextMenu()
-        {  
+        {
             ContextMenuStrip menuStrip = new ContextMenuStrip();
 
             menuStrip.Items.Add("显示", null, ShowWindow);
