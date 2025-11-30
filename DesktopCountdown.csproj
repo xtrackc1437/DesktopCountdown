@@ -14,7 +14,6 @@
     <Deterministic>true</Deterministic>
     <GenerateResourceNeverLockTypeAssemblies>true</GenerateResourceNeverLockTypeAssemblies>
     <DisableOutOfProcTaskHost>true</DisableOutOfProcTaskHost>
-    <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
