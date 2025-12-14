@@ -58,7 +58,7 @@ namespace DesktopCountdown
         /// </summary>
         /// <returns>上下文菜单</returns>
         private ContextMenuStrip CreateContextMenu()
-        {  
+        {
             ContextMenuStrip menuStrip = new ContextMenuStrip();
 
             // 第一部分：显示/隐藏按钮
