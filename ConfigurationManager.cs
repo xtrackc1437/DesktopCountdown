@@ -42,16 +42,17 @@ namespace DesktopCountdown
         {
             if (!File.Exists(configFilePath))
             {
-                MessageBox.Show("配置文件未找到！");
-                return false;
+                MessageBox.Show("配置文件未找到，正在创建默认配置...");
+                WriteDefaultConfiguration();
             }
 
             try
             {
                 string[] configLines = File.ReadAllLines(configFilePath);
                 
-                // 使用Select将配置行转换为键值对
+                // 使用Select将配置行转换为键值对，忽略注释行（以#开头的行）
                 var configPairs = configLines
+                    .Where(line => !string.IsNullOrWhiteSpace(line) && !line.Trim().StartsWith("#"))
                     .Select(line => line.Split('='))
                     .Where(parts => parts.Length == 2)
                     .ToDictionary(
@@ -229,6 +230,75 @@ namespace DesktopCountdown
             catch (Exception ex)
             {
                 MessageBox.Show($"无法打开配置文件: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 创建默认配置文件
+        /// </summary>
+        private void WriteDefaultConfiguration()
+        {
+            try
+            {
+                // 获取屏幕信息以确定右上角位置
+                Screen screen = Screen.PrimaryScreen;
+                int rightMargin = 50;
+                int topMargin = 50;
+                Point topRightPosition = new Point(screen.WorkingArea.Right - 300 - rightMargin, screen.WorkingArea.Top + topMargin);
+
+                // 设置默认配置值
+                EventName = "默认事件";
+                TargetTime = DateTime.Now.AddDays(1); // 默认1天后
+                WindowContent = "距离{EventName}还有{Days}天{Hours}小时{Mins}分{Seconds}秒";
+                WindowSize = new Size(300, 150);
+                FontSize = 24;
+                TextColor = Color.Orange;
+                WindowPosition = topRightPosition;
+
+                // 构建配置内容，包含注释和创建时间
+                string[] configLines = new string[]
+                {
+                    "# 配置文件创建时间 (UTC): " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                    "# Created Time (UTC): " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                    "",
+                    "# 配置教程 / Configuration Tutorial",
+                    "# ----------------------------------",
+                    "# EventName: 事件名称",
+                    "# EventName: Event name",
+                    "",
+                    "# TargetTime: 目标时间 (Unix时间戳格式)",
+                    "# TargetTime: Target time (Unix timestamp format)",
+                    "",
+                    "# WindowContent: 窗口显示内容模板，可用变量: {EventName}, {Days}, {Hours}, {Mins}, {Seconds}",
+                    "# WindowContent: Window display template, available variables: {EventName}, {Days}, {Hours}, {Mins}, {Seconds}",
+                    "",
+                    "# WindowSize: 窗口大小 (small/medium/large)",
+                    "# WindowSize: Window size (small/medium/large)",
+                    "",
+                    "# FontSize: 字体大小",
+                    "# FontSize: Font size",
+                    "",
+                    "# TextColor: 文本颜色 (HTML颜色代码或颜色名称)",
+                    "# TextColor: Text color (HTML color code or color name)",
+                    "",
+                    "# WindowPosition: 窗口位置 (X,Y坐标)",
+                    "# WindowPosition: Window position (X,Y coordinates)",
+                    "",
+                    $"EventName={EventName}",
+                    $"TargetTime={DateTimeOffset.Now.AddDays(1).ToUnixTimeSeconds()}",
+                    $"WindowContent={WindowContent}",
+                    $"WindowSize=medium",
+                    $"FontSize={FontSize}",
+                    $"TextColor={ColorTranslator.ToHtml(TextColor)}",
+                    $"WindowPosition={WindowPosition.X},{WindowPosition.Y}"
+                };
+
+                // 写入配置文件
+                File.WriteAllLines(configFilePath, configLines);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"创建默认配置文件时出错: {ex.Message}");
             }
         }
     }

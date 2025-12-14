@@ -40,6 +40,13 @@ namespace DesktopCountdown
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            // 添加空值检查，避免配置加载失败时出现NullReferenceException
+            if (configManager == null || countdownManager == null)
+            {
+                Application.Exit();
+                return;
+            }
+            
             this.Text = "倒计时应用"; // 设置窗体标题
             this.Size = configManager.WindowSize; // 设置窗体大小
             this.BackColor = Color.Magenta; // 设置背景颜色

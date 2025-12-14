@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
+using DesktopCountdown.Properties;
 using System.IO;
 
 namespace DesktopCountdown
@@ -36,16 +38,8 @@ namespace DesktopCountdown
         {
             try
             {
-                string iconPath = "app.ico";
-                if (File.Exists(iconPath))
-                {
-                    trayIcon.Icon = new Icon(iconPath);
-                }
-                else
-                {
-                    // 使用默认图标作为后备
-                    trayIcon.Icon = SystemIcons.Information;
-                }
+                // 使用Resources.AppIcon获取嵌入的图标
+                trayIcon.Icon = Resources.AppIcon;
                 trayIcon.ContextMenuStrip = CreateContextMenu();
                 trayIcon.Visible = true;
             }
