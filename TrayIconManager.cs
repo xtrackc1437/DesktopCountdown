@@ -61,19 +61,34 @@ namespace DesktopCountdown
         {  
             ContextMenuStrip menuStrip = new ContextMenuStrip();
 
+            // 第一部分：显示/隐藏按钮
             menuStrip.Items.Add("显示", null, ShowWindow);
             menuStrip.Items.Add("隐藏", null, HideWindow);
             menuStrip.Items.Add(new ToolStripSeparator());
-            menuStrip.Items.Add("窗口位置 - 左上角", null, MoveWindowToTopLeft);
-            menuStrip.Items.Add("窗口位置 - 右上角", null, MoveWindowToTopRight);
-            menuStrip.Items.Add("窗口位置 - 左下角", null, MoveWindowToBottomLeft);
-            menuStrip.Items.Add("窗口位置 - 右下角", null, MoveWindowToBottomRight);
+
+            // 第二部分：窗口位置主选项（带子菜单）
+            ToolStripMenuItem windowPositionMenuItem = new ToolStripMenuItem("窗口位置");
+            
+            // 创建子菜单项
+            windowPositionMenuItem.DropDownItems.Add("左上角", null, MoveWindowToTopLeft);
+            windowPositionMenuItem.DropDownItems.Add("右上角", null, MoveWindowToTopRight);
+            windowPositionMenuItem.DropDownItems.Add("左下角", null, MoveWindowToBottomLeft);
+            windowPositionMenuItem.DropDownItems.Add("右下角", null, MoveWindowToBottomRight);
+            
+            menuStrip.Items.Add(windowPositionMenuItem);
             menuStrip.Items.Add(new ToolStripSeparator());
+
+            // 第三部分：配置相关选项
+            menuStrip.Items.Add("重载配置文件", null, ReloadConfig);
             menuStrip.Items.Add("打开配置文件", null, OpenConfigFile);
-            menuStrip.Items.Add("重载配置", null, ReloadConfig);
             menuStrip.Items.Add(new ToolStripSeparator());
+
+            // 第四部分：退出选项
             menuStrip.Items.Add("退出", null, ExitApp);
 
+            // 应用系统主题
+            ThemeManager.ApplyTheme(menuStrip);
+            
             return menuStrip;
         }
 
